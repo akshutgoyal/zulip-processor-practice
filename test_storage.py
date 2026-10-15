@@ -26,15 +26,28 @@ def test_load_missing_file(tmp_path):
 
 def test_history_preserved(tmp_path):
     filename = tmp_path / "messages.json"
-    initial_records = [
-        {"sender": "Alice", "text": "Hello", "category": "Normal", "muted": False}
-    ]
-    save_history(initial_records, filename)
-    new_record = {"sender": "Bob", "text": "Hi there", "category": "Normal", "muted": False}
-    initial_records.append(new_record)
-    save_history(initial_records, filename)
-    loaded = load_history(filename)
-    assert loaded == initial_records
+    alice = {
+        "sender": "Alice",
+        "text": "Hello",
+        "category": "Normal",
+        "muted": False
+    }
+
+    bob = {
+        "sender": "Bob",
+        "text": "Hi there",
+        "category": "Normal",
+        "muted": False
+    }
+    save_history([alice], filename)
+    history = load_history(filename)
+    history.append(bob)
+    
+    save_history(history, filename)
+    result = load_history(filename)
+
+    assert result == [alice, bob]
+    assert len(result) == 2
 
 def test_invalid_json(tmp_path):
     filename = tmp_path / "invalid.json"
